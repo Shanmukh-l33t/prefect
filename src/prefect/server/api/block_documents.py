@@ -65,7 +65,7 @@ async def read_block_documents(
     sort: Optional[schemas.sorting.BlockDocumentSort] = Body(
         schemas.sorting.BlockDocumentSort.NAME_ASC
     ),
-    offset: int = Body(0, ge=0),
+    offset: Optional[int] = Body(0, ge=0),
     db: PrefectDBInterface = Depends(provide_database_interface),
 ) -> List[schemas.core.BlockDocument]:
     """
@@ -79,7 +79,7 @@ async def read_block_documents(
             block_schema_filter=block_schemas,
             include_secrets=include_secrets,
             sort=sort,
-            offset=offset,
+            offset=offset or 0,
             limit=limit,
         )
 

@@ -2,7 +2,7 @@
 Routes for interacting with artifact objects.
 """
 
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import Body, Depends, HTTPException, Path, Response, status
@@ -87,14 +87,14 @@ async def read_latest_artifact(
 
 @router.post("/filter")
 async def read_artifacts(
-    sort: sorting.ArtifactSort = Body(sorting.ArtifactSort.ID_DESC),
+    sort: Optional[sorting.ArtifactSort] = Body(sorting.ArtifactSort.ID_DESC),
     limit: int = dependencies.LimitBody(),
     offset: int = Body(0, ge=0),
-    artifacts: filters.ArtifactFilter = None,
-    flow_runs: filters.FlowRunFilter = None,
-    task_runs: filters.TaskRunFilter = None,
-    flows: filters.FlowFilter = None,
-    deployments: filters.DeploymentFilter = None,
+    artifacts: Optional[filters.ArtifactFilter] = None,
+    flow_runs: Optional[filters.FlowRunFilter] = None,
+    task_runs: Optional[filters.TaskRunFilter] = None,
+    flows: Optional[filters.FlowFilter] = None,
+    deployments: Optional[filters.DeploymentFilter] = None,
     db: PrefectDBInterface = Depends(provide_database_interface),
 ) -> List[core.Artifact]:
     """
@@ -110,20 +110,22 @@ async def read_artifacts(
             deployment_filter=deployments,
             offset=offset,
             limit=limit,
-            sort=sort,
+            sort=sort or sorting.ArtifactSort.ID_DESC,
         )
 
 
 @router.post("/latest/filter")
 async def read_latest_artifacts(
-    sort: sorting.ArtifactCollectionSort = Body(sorting.ArtifactCollectionSort.ID_DESC),
+    sort: Optional[sorting.ArtifactCollectionSort] = Body(
+        sorting.ArtifactCollectionSort.ID_DESC
+    ),
     limit: int = dependencies.LimitBody(),
     offset: int = Body(0, ge=0),
-    artifacts: filters.ArtifactCollectionFilter = None,
-    flow_runs: filters.FlowRunFilter = None,
-    task_runs: filters.TaskRunFilter = None,
-    flows: filters.FlowFilter = None,
-    deployments: filters.DeploymentFilter = None,
+    artifacts: Optional[filters.ArtifactCollectionFilter] = None,
+    flow_runs: Optional[filters.FlowRunFilter] = None,
+    task_runs: Optional[filters.TaskRunFilter] = None,
+    flows: Optional[filters.FlowFilter] = None,
+    deployments: Optional[filters.DeploymentFilter] = None,
     db: PrefectDBInterface = Depends(provide_database_interface),
 ) -> List[core.ArtifactCollection]:
     """
@@ -139,17 +141,17 @@ async def read_latest_artifacts(
             deployment_filter=deployments,
             offset=offset,
             limit=limit,
-            sort=sort,
+            sort=sort or sorting.ArtifactCollectionSort.ID_DESC,
         )
 
 
 @router.post("/count")
 async def count_artifacts(
-    artifacts: filters.ArtifactFilter = None,
-    flow_runs: filters.FlowRunFilter = None,
-    task_runs: filters.TaskRunFilter = None,
-    flows: filters.FlowFilter = None,
-    deployments: filters.DeploymentFilter = None,
+    artifacts: Optional[filters.ArtifactFilter] = None,
+    flow_runs: Optional[filters.FlowRunFilter] = None,
+    task_runs: Optional[filters.TaskRunFilter] = None,
+    flows: Optional[filters.FlowFilter] = None,
+    deployments: Optional[filters.DeploymentFilter] = None,
     db: PrefectDBInterface = Depends(provide_database_interface),
 ) -> int:
     """
